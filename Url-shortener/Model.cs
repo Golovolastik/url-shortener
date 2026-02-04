@@ -8,6 +8,17 @@ public class UrlShortenerContext : DbContext
     }
 
     public DbSet<ShortenedUrl> ShortenedUrls { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ShortenedUrl>(entity =>
+        {
+            // Короткий код должен быть уникальным: один код — одна запись при редиректе.
+            entity.HasIndex(e => e.ShortUrl).IsUnique();
+            // Один длинный URL — одна короткая ссылка (повторное сокращение возвращает существующую).
+            entity.HasIndex(e => e.LongUrl).IsUnique();
+        });
+    }
 }
 
 public class ShortenedUrl

@@ -15,7 +15,7 @@ namespace Url_shortener.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("ShortenedUrl", b =>
@@ -32,13 +32,19 @@ namespace Url_shortener.Migrations
 
                     b.Property<string>("LongUrl")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ShortUrl")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LongUrl")
+                        .IsUnique();
+
+                    b.HasIndex("ShortUrl")
+                        .IsUnique();
 
                     b.ToTable("ShortenedUrls");
                 });

@@ -12,7 +12,7 @@ public static class ShortUrlGenerator
         {46, 'K'}, {47, 'L'}, {48, 'M'}, {49, 'N'}, {50, 'O'}, {51, 'P'}, {52, 'Q'}, {53, 'R'}, {54, 'S'}, {55, 'T'},
         {56, 'U'}, {57, 'V'}, {58, 'W'}, {59, 'X'}, {60, 'Y'}, {61, 'Z'}
     };
-    public static string GenerateShortUrl(int uid){
+    public static string GenerateShortUrl(ulong uid){
         StringBuilder short_url = new StringBuilder();  //  Using StringBuilder to avoid excess copies of the string
         while (uid > 0) {
             int remainder = uid % 62;

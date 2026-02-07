@@ -44,7 +44,7 @@ app.MapGet("/{shortUrl:regex(^(?!Index$|Privacy$|Error$).+)}", async (string sho
     entry.ClickCount++;
     await db.SaveChangesAsync();
 
-    return Results.Redirect(entry.LongUrl, permanent: true, preserveMethod: false);
+    return Results.Redirect(entry.LongUrl, permanent: false, preserveMethod: false);
 });
 
 app.MapRazorPages()

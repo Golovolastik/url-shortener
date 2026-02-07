@@ -1,9 +1,11 @@
+using System.Text;
+
 //  Generating a short URL from a unique ID
 //  Using base62 encoding to avoid special characters
 public static class ShortUrlGenerator
 {
     //  Initializing the base62 characters
-    private Dictionary<char, char> base62_chars = new Dictionary<char, char>(){
+    private static Dictionary<int, char> base62_chars = new Dictionary<int, char>(){
         {0, '0'}, {1, '1'}, {2, '2'}, {3, '3'}, {4, '4'}, {5, '5'}, {6, '6'}, {7, '7'}, {8, '8'}, {9, '9'},
         {10, 'a'}, {11, 'b'}, {12, 'c'}, {13, 'd'}, {14, 'e'}, {15, 'f'}, {16, 'g'}, {17, 'h'}, {18, 'i'}, {19, 'j'},
         {20, 'k'}, {21, 'l'}, {22, 'm'}, {23, 'n'}, {24, 'o'}, {25, 'p'}, {26, 'q'}, {27, 'r'}, {28, 's'}, {29, 't'},
@@ -12,14 +14,15 @@ public static class ShortUrlGenerator
         {46, 'K'}, {47, 'L'}, {48, 'M'}, {49, 'N'}, {50, 'O'}, {51, 'P'}, {52, 'Q'}, {53, 'R'}, {54, 'S'}, {55, 'T'},
         {56, 'U'}, {57, 'V'}, {58, 'W'}, {59, 'X'}, {60, 'Y'}, {61, 'Z'}
     };
+
     public static string GenerateShortUrl(ulong uid){
-        StringBuilder short_url = new StringBuilder();  //  Using StringBuilder to avoid excess copies of the string
+        StringBuilder sb = new StringBuilder();  //  Using StringBuilder to avoid excess copies of the string
         while (uid > 0) {
-            int remainder = uid % 62;
-            short_url.Append(base62_chars[remainder]);
+            ulong remainder = uid % 62;
+            sb.Insert(0, base62_chars[(int)remainder]);
             uid /= 62;
         }
-        return short_url.ToString();
+        return sb.ToString();
     }
 
 }

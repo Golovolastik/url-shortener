@@ -16,8 +16,8 @@ public class UrlShortenerContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             // Unique ShortUrl so redirect /short/{code} always resolves to exactly one target.
             entity.HasIndex(e => e.ShortUrl).IsUnique();
-            // Unique LongUrl so re-submitting the same URL returns the existing short link instead of creating duplicates.
-            entity.HasIndex(e => e.LongUrl).IsUnique();
+            // Non-unique index on first 255 chars of LongUrl to speed up lookups; full uniqueness enforced in ShortenedUrlService.
+            entity.HasIndex(e => e.LongUrl).HasDatabaseName("IX_ShortenedUrls_LongUrl");
         });
     }
 }

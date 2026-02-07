@@ -47,4 +47,12 @@ public class UrlEditorTests
         var result = UrlEditor.ModifyUrl(url);
         Assert.Equal(url, result);
     }
+
+    [Fact]
+    public void ModifyUrl_DataUrl_ReturnsUnchanged()
+    {
+        var url = "data:image/jpeg;base64,/9j/4AAQSkZJRg";
+        var result = UrlEditor.ModifyUrl(url);
+        Assert.Equal(url, result);
+    }
 }

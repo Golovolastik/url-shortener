@@ -99,8 +99,9 @@ public class IndexPageLogicTests : IClassFixture<MigratedDbFixture>
     }
 
     [Fact]
-    public async Task Edit_UpdateLongUrlToDuplicate_ThrowsOrFailsUnique_WithinTransactionThenRollback()
+    public async Task Edit_UpdateLongUrl_CanStoreSameLongUrlAsAnotherRow_WhenNoUniqueIndex_WithinTransactionThenRollback()
     {
+        // LongUrl has no DB unique index (longtext for long/data URLs); duplicate prevention is in ShortenedUrlService / Edit handler.
         var options = TestDbHelper.GetOptions();
         await using var context = new UrlShortenerContext(options);
 
@@ -128,10 +129,12 @@ public class IndexPageLogicTests : IClassFixture<MigratedDbFixture>
             context.ShortenedUrls.AddRange(entityA, entityB);
             await context.SaveChangesAsync();
 
-            var duplicate = await context.ShortenedUrls.FirstOrDefaultAsync(e => e.LongUrl == urlB && e.Id != entityA.Id);
-            Assert.NotNull(duplicate);
             entityA.LongUrl = urlB;
-            await Assert.ThrowsAsync<DbUpdateException>(async () => await context.SaveChangesAsync());
+            await context.SaveChangesAsync();
+
+            var both = await context.ShortenedUrls.Where(e => e.Id == 2003UL || e.Id == 2004UL).ToListAsync();
+            Assert.Equal(2, both.Count);
+            Assert.All(both, e => Assert.Equal(urlB, e.LongUrl));
         }
         finally
         {

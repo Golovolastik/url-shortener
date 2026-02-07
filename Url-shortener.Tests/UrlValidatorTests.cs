@@ -80,4 +80,55 @@ public class UrlValidatorTests
         Assert.True(result);
         Assert.Null(error);
     }
+
+    [Fact]
+    public void IsValid_UrlWithQueryParamsAndPercentEncoding_ReturnsTrue()
+    {
+        var url = "https://catalog.onliner.by/?utm_source=google&utm_medium=cpc&utm_content=onliner%20by%20catalog&utm_content={source}&gclid=abc123";
+        var result = UrlValidator.IsValid(url, out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_UrlWithCurlyBracesInQuery_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://example.com/?tag={source}", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_DataUrl_Base64Image_ReturnsTrue()
+    {
+        var dataUrl = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwoJCAgJCgoLCwgICAoJCAgICBsICQoNIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RDY4QzQ5OjcBCgoKDg0OGhAQGy0mICYtLTEvLjArNy0tKysrLisrKy0rLSstLS0rKystKystLSstLSstLS0tNS0tLTEtLSsvLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAAABwEAAAAAAAAAAAAAAAAAAQIDBAUGB//EAEkQAAIBAwICBgYGAQUH";
+        var result = UrlValidator.IsValid(dataUrl, out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_DataUrl_PlainText_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("data:text/plain,Hello%20World", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_DataUrl_NoComma_ReturnsFalse()
+    {
+        var result = UrlValidator.IsValid("data:image/png", out var error);
+        Assert.False(result);
+        Assert.NotNull(error);
+        Assert.Contains("data URL", error!);
+    }
+
+    [Fact]
+    public void IsValid_DataUrl_EmptyData_ReturnsFalse()
+    {
+        var result = UrlValidator.IsValid("data:image/jpeg;base64,", out var error);
+        Assert.False(result);
+        Assert.NotNull(error);
+    }
 }

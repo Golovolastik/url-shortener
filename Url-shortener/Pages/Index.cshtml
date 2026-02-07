@@ -42,7 +42,7 @@
                 {
                     <tr>
                         <td>@item.Id</td>
-                        <td><a href="@item.LongUrl" target="_blank" rel="noopener">@item.LongUrl</a></td>
+                        <td><span title="@item.LongUrl">@(item.LongUrl.Length > 32 ? item.LongUrl.Substring(0, 32) + "…" : item.LongUrl)</span></td>
                         <td><a href="/short/@item.ShortUrl" target="_blank" rel="noopener">short.yankovich.by/@item.ShortUrl</a></td>
                         <td>@item.ClickCount</td>
                         <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>

@@ -55,4 +55,12 @@ public class UrlEditorTests
         var result = UrlEditor.ModifyUrl(url);
         Assert.Equal(url, result);
     }
+
+    [Fact]
+    public void ModifyUrl_ComplexUrlWithoutScheme_AddsHttpsPreservesPathQueryFragment()
+    {
+        var url = "api.example.com/v1/resource?filter=a&page=1#section";
+        var result = UrlEditor.ModifyUrl(url);
+        Assert.Equal("https://api.example.com/v1/resource?filter=a&page=1#section", result);
+    }
 }

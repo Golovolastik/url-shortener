@@ -131,4 +131,81 @@ public class UrlValidatorTests
         Assert.False(result);
         Assert.NotNull(error);
     }
+
+    // --- Complex URLs: port, fragment, long path, encoding, multiple query params ---
+
+    [Fact]
+    public void IsValid_UrlWithPort_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://example.com:8080/api/v1", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_UrlWithFragment_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://example.com/page#section", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_UrlWithQueryAndFragment_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://example.org/search?q=test&page=1#results", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_LongPathWithManySegments_ReturnsTrue()
+    {
+        var url = "https://docs.example.com/a/b/c/d/e/f/g/h/page";
+        var result = UrlValidator.IsValid(url, out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_MultipleSubdomainsWithPathAndQuery_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://api.staging.cdn.example.co.uk/v2/assets?id=42", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_PathWithPercentEncoding_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://example.com/path%2Fwith%20spaces?name=foo%26bar", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_ManyQueryParametersWithEncodingAndBraces_ReturnsTrue()
+    {
+        var url = "https://tracker.example.com/campaign?utm_source={source}&utm_medium={medium}&ref=%2Fpage&foo=1&bar=2&baz=3";
+        var result = UrlValidator.IsValid(url, out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_UrlWithBracketsInPath_ReturnsTrue()
+    {
+        var result = UrlValidator.IsValid("https://example.com/path[1]/item?id=1", out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void IsValid_ComplexUrlWithoutScheme_AddsHttpsAndReturnsTrue()
+    {
+        var input = "sub.example.com/very/long/path?utm_source=google&token={id}#anchor";
+        var result = UrlValidator.IsValid(input, out var error);
+        Assert.True(result);
+        Assert.Null(error);
+    }
 }

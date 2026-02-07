@@ -43,7 +43,7 @@
                     <tr>
                         <td>@item.Id</td>
                         <td><span title="@item.LongUrl">@(item.LongUrl.Length > 32 ? item.LongUrl.Substring(0, 32) + "…" : item.LongUrl)</span></td>
-                        <td><a href="/short/@item.ShortUrl" target="_blank" rel="noopener">short.yankovich.by/@item.ShortUrl</a></td>
+                        <td><a href="/@item.ShortUrl" target="_blank" rel="noopener">short.yankovich.by/@item.ShortUrl</a></td>
                         <td>@item.ClickCount</td>
                         <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
                         <td class="text-nowrap">

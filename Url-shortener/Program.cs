@@ -33,6 +33,20 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// Redirect short.yankovich.by/{shortUrl} to long URL; exclude Razor Page paths (Index, Privacy, Error).
+app.MapGet("/{shortUrl:regex(^(?!Index$|Privacy$|Error$).+)}", async (string shortUrl, UrlShortenerContext db) =>
+{
+    var entry = await db.ShortenedUrls.FirstOrDefaultAsync(e => e.ShortUrl == shortUrl);
+    if (entry == null)
+        return Results.NotFound();
+
+    entry.ClickCount++;
+    await db.SaveChangesAsync();
+
+    return Results.Redirect(entry.LongUrl, permanent: true, preserveMethod: false);
+});
+
 app.MapRazorPages()
    .WithStaticAssets();
 

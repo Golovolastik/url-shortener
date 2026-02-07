@@ -1,10 +1,120 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Сокращение ссылок";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <h1 class="mb-4">Сокращение ссылок</h1>
+
+    <form method="post" class="mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-auto flex-grow-1">
+                <label for="LongUrl" class="form-label">Длинный URL</label>
+                <input type="text" class="form-control @(Model.ValidationError != null ? "is-invalid" : "")" id="LongUrl" name="LongUrl"
+                       placeholder="example.com или https://example.com" value="@Model.LongUrl" autocomplete="url" />
+                @if (Model.ValidationError != null)
+                {
+                    <div class="invalid-feedback d-block">@Model.ValidationError</div>
+                }
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </div>
+        </div>
+    </form>
+
+    <h2 class="h5 mb-3">Сохранённые ссылки</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Длинный URL</th>
+                    <th>Короткий URL</th>
+                    <th>Переходы</th>
+                    <th>Создано</th>
+                    <th>Управление</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ShortenedUrls)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td><a href="@item.LongUrl" target="_blank" rel="noopener">@item.LongUrl</a></td>
+                        <td><a href="/short/@item.ShortUrl" target="_blank" rel="noopener">short.yankovich.by/@item.ShortUrl</a></td>
+                        <td>@item.ClickCount</td>
+                        <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td class="text-nowrap">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.Id" data-longurl="@item.LongUrl" title="Редактировать" aria-label="Редактировать">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+                            </button>
+                            <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Удалить эту ссылку?');">
+                                <input type="hidden" name="DeleteId" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить" aria-label="Удалить">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @if (Model.ShortenedUrls.Count == 0)
+        {
+            <p class="text-muted">Пока нет сохранённых ссылок.</p>
+        }
+    </div>
 </div>
+
+<!-- Модальное окно редактирования длинного URL -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Редактировать длинный URL</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form method="post" asp-page-handler="Edit">
+                <div class="modal-body">
+                    <input type="hidden" name="EditId" id="editId" value="@Model.EditId" />
+                    <div class="mb-3">
+                        <label for="editLongUrl" class="form-label">Длинный URL</label>
+                        <input type="text" class="form-control @(Model.EditValidationError != null ? "is-invalid" : "")" name="EditLongUrl" id="editLongUrl" placeholder="https://example.com" value="@Model.EditLongUrl" />
+                        @if (Model.EditValidationError != null)
+                        {
+                            <div class="invalid-feedback d-block">@Model.EditValidationError</div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">ОК</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var editModal = document.getElementById('editModal');
+    if (!editModal) return;
+    editModal.addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        if (btn && btn.dataset.id !== undefined) {
+            document.getElementById('editId').value = btn.dataset.id || '';
+            document.getElementById('editLongUrl').value = btn.dataset.longurl || '';
+            document.querySelector('#editModal .invalid-feedback')?.classList.remove('d-block');
+            document.getElementById('editLongUrl').classList.remove('is-invalid');
+        }
+    });
+    @if (Model.EditValidationError != null)
+    {
+        @:var bsModal = new bootstrap.Modal(editModal); bsModal.show();
+    }
+})();
+</script>
+}

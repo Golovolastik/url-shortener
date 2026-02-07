@@ -13,9 +13,10 @@ public class UrlShortenerContext : DbContext
     {
         modelBuilder.Entity<ShortenedUrl>(entity =>
         {
-            // Короткий код должен быть уникальным: один код — одна запись при редиректе.
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            // Unique ShortUrl so redirect /short/{code} always resolves to exactly one target.
             entity.HasIndex(e => e.ShortUrl).IsUnique();
-            // Один длинный URL — одна короткая ссылка (повторное сокращение возвращает существующую).
+            // Unique LongUrl so re-submitting the same URL returns the existing short link instead of creating duplicates.
             entity.HasIndex(e => e.LongUrl).IsUnique();
         });
     }
@@ -23,7 +24,8 @@ public class UrlShortenerContext : DbContext
 
 public class ShortenedUrl
 {
-    public int Id { get; set; }
+    /// <summary>Primary key is the same uid used to build ShortUrl (base62), so Id is derivable from the short code.</summary>
+    public ulong Id { get; set; }
     public string LongUrl { get; set; }
     public string ShortUrl { get; set; }
     public int ClickCount { get; set; }

@@ -4,7 +4,7 @@ using Xunit;
 namespace Url_shortener.Tests;
 
 /// <summary>
-/// Применяет миграции к БД один раз перед первым тестом в ShortenedUrlCrudTests.
+/// Runs migrations once so CRUD tests share a ready schema without re-migrating per test.
 /// </summary>
 public class MigratedDbFixture : IDisposable
 {
@@ -19,8 +19,7 @@ public class MigratedDbFixture : IDisposable
 }
 
 /// <summary>
-/// CRUD-тесты для ShortenedUrl. Все операции выполняются в транзакции с откатом,
-/// чтобы данные в БД не изменялись после тестов. Схема БД создаётся фикстурой один раз.
+/// CRUD tests use a transaction with rollback so the DB is left unchanged and tests can run repeatedly against a shared instance.
 /// </summary>
 public class ShortenedUrlCrudTests : IClassFixture<MigratedDbFixture>
 {
@@ -35,6 +34,7 @@ public class ShortenedUrlCrudTests : IClassFixture<MigratedDbFixture>
         {
             var entity = new ShortenedUrl
             {
+                Id = 1001UL,
                 LongUrl = "https://example.com/crud-create-test",
                 ShortUrl = "abc-create",
                 ClickCount = 0,
@@ -67,6 +67,7 @@ public class ShortenedUrlCrudTests : IClassFixture<MigratedDbFixture>
         {
             var entity = new ShortenedUrl
             {
+                Id = 1002UL,
                 LongUrl = "https://example.com/crud-read-test",
                 ShortUrl = "abc-read",
                 ClickCount = 5,
@@ -98,6 +99,7 @@ public class ShortenedUrlCrudTests : IClassFixture<MigratedDbFixture>
         {
             var entity = new ShortenedUrl
             {
+                Id = 1003UL,
                 LongUrl = "https://example.com/crud-update-test",
                 ShortUrl = "abc-update",
                 ClickCount = 0,
@@ -131,6 +133,7 @@ public class ShortenedUrlCrudTests : IClassFixture<MigratedDbFixture>
         {
             var entity = new ShortenedUrl
             {
+                Id = 1004UL,
                 LongUrl = "https://example.com/crud-delete-test",
                 ShortUrl = "abc-delete",
                 ClickCount = 0,

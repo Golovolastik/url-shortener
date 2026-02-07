@@ -6,8 +6,7 @@ namespace Url_shortener.Tests;
 public class DatabaseConnectionTests
 {
     /// <summary>
-    /// Проверяет, что приложение может установить подключение к MySQL.
-    /// Требует запущенный MySQL и корректную строку в appsettings.json или ConnectionStrings__DefaultConnection.
+    /// Fails fast in CI/local if MySQL is down or connection string is wrong so DB-dependent tests aren’t misleading.
     /// </summary>
     [Fact]
     public async Task CanConnectToDatabase_ReturnsTrue()
@@ -16,7 +15,7 @@ public class DatabaseConnectionTests
         await using var context = new UrlShortenerContext(options);
         var canConnect = await context.Database.CanConnectAsync();
 
-        Assert.True(canConnect, "Не удалось подключиться к БД. Проверьте, что MySQL запущен и строка подключения верна.");
+        Assert.True(canConnect, "Could not connect to DB. Ensure MySQL is running and connection string is correct.");
     }
 
     [Fact]

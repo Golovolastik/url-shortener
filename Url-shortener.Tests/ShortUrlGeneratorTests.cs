@@ -3,7 +3,7 @@ using Xunit;
 namespace Url_shortener.Tests;
 
 /// <summary>
-/// Тесты для ShortUrlGenerator (base62-кодирование uid в короткий URL).
+/// Ensures base62 encoding is deterministic and URL-safe so short codes are stable and usable in paths.
 /// </summary>
 public class ShortUrlGeneratorTests
 {
